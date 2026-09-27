@@ -1,0 +1,76 @@
+/* Page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+  line-height: 1.6;
+  padding: 30px;
+}
+
+/* Resume */
+.resume-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  border-bottom: 2px solid #2b6cb0;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.header h1 {
+  font-size: 32px;
+  color: #222;
+  margin-bottom: 5px;
+}
+
+.contact-info {
+  color: #555;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 25px;
+}
+
+.section h2 {
+  color: #2b6cb0;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  margin-bottom: 12px;
+}
+
+/* Resume Items */
+.item {
+  margin-bottom: 20px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.item-header span {
+  color: #666;
+  font-style: italic;
+}
+
+.item p {
+  margin: 4px 0;
+}
+
+/* Lists */
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 5px;
+}
