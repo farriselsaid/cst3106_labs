@@ -1,0 +1,17 @@
+{
+    "folders": [
+        {
+            "name": "cst3106_labs",
+            "path": "."
+        },
+        {
+            "path": "../portfolio"
+        },
+        {
+            "path": "../yatzy"
+        },
+        {
+            "path": "../emergency waitlist"
+        }
+    ]
+}
