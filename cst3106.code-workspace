@@ -1,17 +1,18 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../emergency waitlist"
-		},
-		{
-			"path": "../portfolio"
-		},
-		{
-			"path": "../yatzy"
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "name": "cst3106_labs",
+            "path": "."
+        },
+        {
+            "path": "../emergency waitlist"
+        },
+        {
+            "path": "../portfolio"
+        },
+        {
+            "path": "../yatzy"
+        }
+    ],
+    "settings": {}
 }
