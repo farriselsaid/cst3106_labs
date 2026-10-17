@@ -14,5 +14,7 @@
             "path": "../yatzy"
         }
     ],
-    "settings": {}
+    "settings": {
+        "liveServer.settings.multiRootWorkspaceName": "yatzy"
+    }
 }
