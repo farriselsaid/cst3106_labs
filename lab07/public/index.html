@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yatzy Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- Main page header -->
+    <header class="header">
+        <h1>YATZY</h1>
+    </header>
+
+    <!-- Main game layout -->
+    <main class="game-container">
+
+        <!-- Scorecard on the left -->
+        <section class="scorecard">
+            <h2>Scorecard</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr><td>Ones</td><td></td></tr>
+                    <tr><td>Twos</td><td></td></tr>
+                    <tr><td>Threes</td><td></td></tr>
+                    <tr><td>Fours</td><td></td></tr>
+                    <tr><td>Fives</td><td></td></tr>
+                    <tr><td>Sixes</td><td></td></tr>
+                    <tr class="section-row"><td>Sum</td><td>0</td></tr>
+                    <tr><td>Bonus</td><td>0</td></tr>
+                    <tr class="section-row"><td>One Pair</td><td></td></tr>
+                    <tr><td>Two Pairs</td><td></td></tr>
+                    <tr><td>Three of a Kind</td><td></td></tr>
+                    <tr><td>Four of a Kind</td><td></td></tr>
+                    <tr><td>Small Straight</td><td></td></tr>
+                    <tr><td>Large Straight</td><td></td></tr>
+                    <tr><td>Full House</td><td></td></tr>
+                    <tr><td>Chance</td><td></td></tr>
+                    <tr><td>Yatzy</td><td></td></tr>
+                    <tr class="total-row"><td>Total</td><td>0</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Main game area -->
+        <section class="game-area">
+
+            <div class="player-info">
+                <h2>Your Turn</h2>
+                <p>Roll the dice and choose your combination.</p>
+            </div>
+
+            <div class="dice-container">
+                <button class="die" type="button" aria-label="Die 1 showing one" data-value="1">
+                    <span class="pip center"></span>
+                </button>
+
+                <button class="die" type="button" aria-label="Die 2 showing five" data-value="5">
+                    <span class="pip top-left"></span>
+                    <span class="pip top-right"></span>
+                    <span class="pip center"></span>
+                    <span class="pip bottom-left"></span>
+                    <span class="pip bottom-right"></span>
+                </button>
+
+                <button class="die selected" type="button" aria-label="Die 3 showing three" data-value="3">
+                    <span class="pip top-left"></span>
+                    <span class="pip center"></span>
+                    <span class="pip bottom-right"></span>
+                </button>
+
+                <button class="die" type="button" aria-label="Die 4 showing three" data-value="3">
+                    <span class="pip top-left"></span>
+                    <span class="pip center"></span>
+                    <span class="pip bottom-right"></span>
+                </button>
+
+                <button class="die" type="button" aria-label="Die 5 showing two" data-value="2">
+                    <span class="pip top-right"></span>
+                    <span class="pip bottom-left"></span>
+                </button>
+            </div>
+
+            <div class="roll-info">
+                <p>Rolls remaining: <span id="rolls-remaining">3</span></p>
+            </div>
+
+            <button class="roll-button" id="roll-button" type="button">
+                ROLL DICE
+            </button>
+
+            <p class="helper-text" id="helper-text">Select the dice you want to keep.</p>
+
+        </section>
+
+    </main>
+
+    <script type="module">
+        import Dice from './Dice.js';
+
+        const dice = new Dice(5);
+        const dieButtons = Array.from(document.querySelectorAll('.die'));
+        const rollButton = document.getElementById('roll-button');
+        const rollsRemainingText = document.getElementById('rolls-remaining');
+        const helperText = document.getElementById('helper-text');
+        const playerHeading = document.querySelector('.player-info h2');
+
+        let rollsRemaining = 3;
+        let turnStarted = false;
+        let gameOver = false;
+
+        const pipPositions = {
+            1: ['center'],
+            2: ['top-left', 'bottom-right'],
+            3: ['top-left', 'center', 'bottom-right'],
+            4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+            5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+            6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right']
+        };
+
+        function displayDie(button, value, index) {
+            button.dataset.value = value;
+            button.setAttribute(
+                'aria-label',
+                `Die ${index + 1} showing ${value}${button.classList.contains('selected') ? ', selected to keep' : ''}`
+            );
+
+            button.replaceChildren();
+
+            pipPositions[value].forEach(position => {
+                const pip = document.createElement('span');
+                pip.classList.add('pip', position);
+                button.appendChild(pip);
+            });
+        }
+
+        function updateRollDisplay() {
+            rollsRemainingText.textContent = rollsRemaining;
+            rollButton.disabled = rollsRemaining === 0 || gameOver;
+        }
+
+        function resetTurn() {
+            rollsRemaining = 3;
+            turnStarted = false;
+
+            dieButtons.forEach(button => {
+                button.classList.remove('selected');
+            });
+
+            updateRollDisplay();
+            playerHeading.textContent = 'Your Turn';
+            helperText.textContent = 'Select the dice you want to keep.';
+        }
+
+        dieButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                if (!turnStarted || rollsRemaining === 3 || gameOver) {
+                    helperText.textContent = 'Roll the dice first, then select the dice you want to keep.';
+                    return;
+                }
+
+                button.classList.toggle('selected');
+
+                const value = Number(button.dataset.value);
+                button.setAttribute(
+                    'aria-label',
+                    `Die ${index + 1} showing ${value}${button.classList.contains('selected') ? ', selected to keep' : ''}`
+                );
+            });
+        });
+
+        rollButton.addEventListener('click', async () => {
+            if (rollsRemaining <= 0 || gameOver) {
+                return;
+            }
+
+            rollButton.disabled = true;
+            helperText.textContent = 'Rolling dice...';
+
+            try {
+                const previousValues = dieButtons.map(button => Number(button.dataset.value));
+                const newValues = await dice.rollAll();
+
+                dieButtons.forEach((button, index) => {
+                    if (!button.classList.contains('selected')) {
+                        displayDie(button, newValues[index], index);
+                    } else {
+                        displayDie(button, previousValues[index], index);
+                    }
+                });
+
+                rollsRemaining--;
+                turnStarted = true;
+
+                updateRollDisplay();
+
+                helperText.textContent = rollsRemaining === 0
+                    ? 'No rolls remaining. Start a new turn to roll again.'
+                    : 'Select the dice you want to keep.';
+            } catch (error) {
+                helperText.textContent = error.message;
+            } finally {
+                rollButton.disabled = rollsRemaining === 0 || gameOver;
+            }
+        });
+
+        const newTurnButton = document.createElement('button');
+        newTurnButton.type = 'button';
+        newTurnButton.id = 'new-turn-button';
+        newTurnButton.className = 'new-turn-button';
+        newTurnButton.textContent = 'NEW TURN';
+        newTurnButton.addEventListener('click', () => {
+            if (gameOver) {
+                return;
+            }
+
+            resetTurn();
+            helperText.textContent = 'New turn started. Roll the dice.';
+        });
+
+        rollButton.insertAdjacentElement('afterend', newTurnButton);
+
+        dieButtons.forEach((button, index) => {
+            displayDie(button, Number(button.dataset.value), index);
+        });
+
+        updateRollDisplay();
+    </script>
+
+</body>
+</html>
