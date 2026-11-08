@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yatzy</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>YATZY</h1>
+    </header>
+
+    <main class="game-container">
+
+        <section class="scorecard">
+            <h2>SCORECARD</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-category="ones">
+                        <td>Ones</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="twos">
+                        <td>Twos</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="threes">
+                        <td>Threes</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="fours">
+                        <td>Fours</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="fives">
+                        <td>Fives</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="sixes">
+                        <td>Sixes</td>
+                        <td></td>
+                    </tr>
+                    <tr class="section-row">
+                        <td>Sum</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Bonus</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="one-pair">
+                        <td>One Pair</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="two-pairs">
+                        <td>Two Pairs</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="three-kind">
+                        <td>Three of a Kind</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="four-kind">
+                        <td>Four of a Kind</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="small-straight">
+                        <td>Small Straight</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="large-straight">
+                        <td>Large Straight</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="full-house">
+                        <td>Full House</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="chance">
+                        <td>Chance</td>
+                        <td></td>
+                    </tr>
+                    <tr data-category="yatzy">
+                        <td>Yatzy</td>
+                        <td></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>Total Score</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="game-area">
+
+            <div class="player-info">
+                <h2>Your Turn</h2>
+                <p>Roll the dice and choose your combination.</p>
+            </div>
+
+            <div class="dice-container">
+
+                <button class="die" data-value="1" aria-label="Die showing 1">
+                    <div class="die-cube"></div>
+                </button>
+
+                <button class="die" data-value="5" aria-label="Die showing 5">
+                    <div class="die-cube"></div>
+                </button>
+
+                <button class="die" data-value="3" aria-label="Die showing 3">
+                    <div class="die-cube"></div>
+                </button>
+
+                <button class="die" data-value="3" aria-label="Die showing 3">
+                    <div class="die-cube"></div>
+                </button>
+
+                <button class="die" data-value="2" aria-label="Die showing 2">
+                    <div class="die-cube"></div>
+                </button>
+
+            </div>
+
+            <div class="roll-info">
+                <p>Rolls remaining: <span id="rolls-remaining">3</span></p>
+            </div>
+
+            <button id="roll-button" class="roll-button">ROLL DICE</button>
+
+            <p id="helper-text" class="helper-text">
+                Select the dice you want to keep.
+            </p>
+
+        </section>
+    </main>
+
+    <script type="module">
+        import Dice from './Dice.js';
+
+        const dice = new Dice(5);
+
+        const dieButtons = [...document.querySelectorAll('.die')];
+        const rollButton = document.getElementById('roll-button');
+        const rollsDisplay = document.getElementById('rolls-remaining');
+        const helperText = document.getElementById('helper-text');
+        const playerHeading = document.querySelector('.player-info h2');
+
+        let rollsRemaining = 3;
+        let turnStarted = false;
+        let gameOver = false;
+        let rollNumber = 0;
+
+        // Rotation needed to show each number on the front.
+        const diceFaces = {
+            1: { x: 0, y: 0 },
+            2: { x: -90, y: 0 },
+            3: { x: 0, y: 90 },
+            4: { x: 0, y: -90 },
+            5: { x: 90, y: 0 },
+            6: { x: 0, y: 180 }
+        };
+
+        // Dot positions for each side of the die.
+        const pipPatterns = {
+            1: ['center'],
+            2: ['top-right', 'bottom-left'],
+            3: ['top-right', 'center', 'bottom-left'],
+            4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+            5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+            6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right']
+        };
+
+        // The six sides of each cube.
+        const faceValues = {
+            front: 1,
+            back: 6,
+            right: 3,
+            left: 4,
+            top: 5,
+            bottom: 2
+        };
+
+        // Create the six faces and their dots.
+        function createDie(button) {
+            const cube = button.querySelector('.die-cube');
+
+            Object.entries(faceValues).forEach(([faceName, value]) => {
+                const face = document.createElement('div');
+                face.className = `face ${faceName}`;
+
+                pipPatterns[value].forEach(position => {
+                    const pip = document.createElement('span');
+                    pip.className = `pip ${position}`;
+                    face.appendChild(pip);
+                });
+
+                cube.appendChild(face);
+            });
+        }
+
+        // Display a number and rotate the cube to that face.
+        function displayDie(button, value, animate = true) {
+            const cube = button.querySelector('.die-cube');
+            const face = diceFaces[value];
+
+            button.dataset.value = value;
+            button.setAttribute('aria-label', `Die showing ${value}`);
+
+            cube.style.transition = animate
+                ? 'transform 1s cubic-bezier(0.2, 0.7, 0.2, 1)'
+                : 'none';
+
+            const extraSpin = animate ? rollNumber * 720 : 0;
+
+            cube.style.transform =
+                `rotateX(${extraSpin + face.x}deg) rotateY(${extraSpin + face.y}deg)`;
+        }
+
+        function updateRollDisplay() {
+            rollsDisplay.textContent = rollsRemaining;
+            rollButton.disabled = rollsRemaining === 0 || gameOver;
+        }
+
+        function resetTurn() {
+            rollsRemaining = 3;
+            turnStarted = false;
+            rollNumber = 0;
+
+            dieButtons.forEach(button => {
+                button.classList.remove('selected');
+
+                // Keep the displayed dice values for the next turn.
+                displayDie(button, Number(button.dataset.value), false);
+            });
+
+            playerHeading.textContent = 'Your Turn';
+            helperText.textContent = 'Select the dice you want to keep.';
+
+            updateRollDisplay();
+        }
+
+        // Select or unselect dice to keep.
+        dieButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (!turnStarted || rollsRemaining === 3 || gameOver) {
+                    return;
+                }
+
+                button.classList.toggle('selected');
+            });
+        });
+
+        // Roll the dice using the values returned by the server.
+        rollButton.addEventListener('click', async () => {
+            if (rollsRemaining === 0 || gameOver) {
+                return;
+            }
+
+            rollButton.disabled = true;
+            helperText.textContent = 'Rolling dice...';
+
+            try {
+                const newValues = await dice.rollAll();
+
+                rollNumber++;
+
+                dieButtons.forEach((button, index) => {
+                    if (!button.classList.contains('selected')) {
+                        displayDie(button, newValues[index], true);
+                    }
+                });
+
+                rollsRemaining--;
+                turnStarted = true;
+
+                if (rollsRemaining > 0) {
+                    helperText.textContent = 'Select the dice you want to keep.';
+                } else {
+                    helperText.textContent = 'Choose a category on your scorecard.';
+                }
+
+                updateRollDisplay();
+
+            } catch (error) {
+                console.error(error);
+                helperText.textContent =
+                    error.message || 'Unable to roll dice.';
+
+                rollButton.disabled = rollsRemaining === 0 || gameOver;
+            }
+        });
+
+        // Create the New Turn button.
+        const newTurnButton = document.createElement('button');
+        newTurnButton.textContent = 'NEW TURN';
+        newTurnButton.className = 'new-turn-button';
+
+        rollButton.insertAdjacentElement('afterend', newTurnButton);
+
+        newTurnButton.addEventListener('click', () => {
+            if (!gameOver) {
+                resetTurn();
+            }
+        });
+
+        // Set up the starting dice.
+        dieButtons.forEach(button => {
+            createDie(button);
+            displayDie(button, Number(button.dataset.value), false);
+        });
+
+        updateRollDisplay();
+    </script>
+
+</body>
+
+</html>
