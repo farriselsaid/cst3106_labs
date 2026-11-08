@@ -35,35 +35,38 @@ body {
 
 .game-container {
     display: grid;
-    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-columns: 380px minmax(0, 1fr);
     gap: 28px;
-    height: calc(100vh - 65px);
-    padding: 8px 18px;
+    min-height: calc(100vh - 65px);
+    padding: 12px 18px;
 }
 
-.scorecard {
+/* Scorecard */
+
+.game-container>.scorecard {
     display: flex;
     flex-direction: column;
+    align-self: stretch;
+    width: 100%;
     overflow: hidden;
     background: var(--white);
     color: #25332d;
-    border: 1px solid #d8e6d9;
+    border: 1px solid #b8cbb8;
     border-radius: 8px;
     box-shadow: 0 5px 18px #0004;
 }
 
 .scorecard h2 {
     margin: 0;
-    padding: 12px;
+    padding: 14px;
     background: var(--green);
     color: var(--white);
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .scorecard table {
     width: 100%;
-    height: 100%;
     flex: 1;
     table-layout: fixed;
     border-collapse: collapse;
@@ -75,8 +78,8 @@ body {
 
 .scorecard th,
 .scorecard td {
-    padding: 5px 10px;
-    font-size: 12px;
+    padding: 7px 12px;
+    font-size: 14px;
 }
 
 .scorecard th {
@@ -85,50 +88,109 @@ body {
 }
 
 .scorecard th:last-child {
-    width: 58px;
+    width: 75px;
     text-align: center;
 }
 
 .scorecard td {
-    line-height: 1.1;
-    border-bottom: 1px solid #e1e9df;
+    line-height: 1.2;
+    border-bottom: 1px solid #b8cbb8;
 }
 
 .scorecard td:first-child {
     white-space: nowrap;
 }
 
-.scorecard tbody tr:nth-child(odd) td:first-child {
-    background: #f1f6ed;
+/* Regular categories */
+
+.scorecard tbody tr[data-category] td {
+    background: var(--white);
+    color: #25332d;
 }
+
+/* Score column */
 
 .scorecard td:last-child {
     text-align: center;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     color: var(--green);
-    background: #f0faf4;
-    border-left: 2px solid #dcece0;
+    border-left: 2px solid #b8cbb8;
 }
 
-.scorecard .section-row td {
-    border-top: 2px solid #cbdcc9;
-    font-weight: bold;
-}
+/* Sum, Bonus, and Total Score */
 
-.scorecard .total-row td {
+.scorecard tbody tr.section-row td,
+.scorecard tbody tr.summary-row td,
+.scorecard tbody tr.total-row td {
     background: var(--light);
     color: #14552f;
     font-weight: bold;
+}
+
+.scorecard .section-row td {
+    border-top: 2px solid #9eb79f;
+}
+
+.scorecard .summary-row td {
+    border-top: 1px solid #9eb79f;
+}
+
+.scorecard .total-row td {
     border-top: 2px solid var(--green);
     border-bottom: none;
 }
 
 .scorecard .total-row td:last-child {
-    background: #08783f;
-    color: var(--white);
-    font-size: 16px;
+    background: var(--light);
+    color: #14552f;
+    font-size: 17px;
 }
+
+/* Available categories */
+
+.scorecard tbody tr.available {
+    cursor: pointer;
+}
+
+/* Potential scores */
+
+.scorecard tbody td:last-child:has(.potential-score) {
+    background: #fff3a6;
+    color: #25332d;
+}
+
+.scorecard tbody td:last-child:has(.potential-score):hover {
+    background: #ffe88a;
+    text-decoration: none;
+}
+
+/* Completed categories */
+
+.scorecard tbody tr.scored {
+    cursor: default;
+    opacity: 0.8;
+}
+
+.scorecard tbody tr.last-scored {
+    opacity: 1;
+    cursor: default;
+}
+
+.scorecard tbody tr.last-scored td,
+.scorecard tbody tr.last-scored td:first-child,
+.scorecard tbody tr.last-scored td:last-child {
+    background: #a8e6a3 !important;
+    color: #174b26;
+    font-weight: bold;
+}
+
+.scorecard tbody tr:focus-visible {
+    outline: 2px solid #08783f;
+    outline-offset: -2px;
+}
+
+/* Game area */
 
 .game-area {
     display: flex;
@@ -143,7 +205,7 @@ body {
 
 .player-info h2 {
     margin: 8px 0 5px;
-    font-size: 23px;
+    font-size: 26px;
 }
 
 .player-info p,
@@ -152,17 +214,23 @@ body {
     font-size: 13px;
 }
 
+.player-info p {
+    font-size: 16px;
+}
+
 .player-info p,
 .roll-info p,
 .helper-text {
     margin: 0;
 }
 
+/* Dice container */
+
 .dice-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 22px;
+    gap: 18px;
     width: 100%;
     max-width: 480px;
     margin: 8px auto;
@@ -192,6 +260,8 @@ body {
     transform-style: preserve-3d;
     transition: transform 1s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
+
+/* Dice faces */
 
 .face {
     position: absolute;
@@ -228,6 +298,8 @@ body {
     transform: rotateX(-90deg) translateZ(36px);
 }
 
+/* Dice dots */
+
 .pip {
     position: absolute;
     width: 11px;
@@ -235,8 +307,6 @@ body {
     border-radius: 50%;
     background: #252a25;
 }
-
-/* Corner dots */
 
 .top-left {
     top: 10px;
@@ -258,15 +328,11 @@ body {
     bottom: 10px;
 }
 
-/* Center dot */
-
 .center {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
-/* Middle dots for a six */
 
 .middle-left {
     top: 50%;
@@ -294,7 +360,7 @@ body {
 /* Roll controls */
 
 .roll-info p {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .roll-button {
@@ -321,7 +387,10 @@ body {
     cursor: not-allowed;
 }
 
-.new-turn-button {
+/* New Turn and Restart buttons */
+
+.new-turn-button,
+.restart-button {
     padding: 12px 24px;
     border: 2px solid var(--lime);
     border-radius: 10px;
@@ -335,60 +404,64 @@ body {
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.new-turn-button:hover:not(:disabled) {
+.new-turn-button:hover:not(:disabled),
+.restart-button:hover:not(:disabled) {
     background: var(--green);
     transform: translateY(-2px);
     box-shadow: 0 6px 14px #0004;
 }
 
-.new-turn-button:active:not(:disabled) {
+.new-turn-button:active:not(:disabled),
+.restart-button:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: 0 2px 5px #0003;
 }
 
-.new-turn-button:disabled {
+.new-turn-button:disabled,
+.restart-button:disabled {
     opacity: 0.65;
     cursor: not-allowed;
 }
 
+.roll-button:focus-visible,
+.new-turn-button:focus-visible,
+.restart-button:focus-visible,
+.die:focus-visible {
+    outline: 3px solid var(--lime);
+    outline-offset: 3px;
+}
+
 .helper-text {
+    max-width: 420px;
     font-size: 12px;
+    line-height: 1.5;
+}
+
+[hidden] {
+    display: none !important;
 }
 
 /* Smaller desktop screens */
 
-@media (max-height: 800px) and (min-width: 651px) {
+@media (max-width: 900px) and (min-width: 651px) {
     .game-container {
-        gap: 22px;
-        padding: 6px 14px;
-    }
-
-    .scorecard h2 {
-        padding: 8px;
-        font-size: 14px;
+        grid-template-columns: 340px minmax(0, 1fr);
+        gap: 18px;
+        padding: 10px;
     }
 
     .scorecard th,
     .scorecard td {
-        padding: 3px 8px;
-        font-size: 11px;
-    }
-
-    .scorecard td:last-child,
-    .scorecard .total-row td {
+        padding: 6px 8px;
         font-size: 12px;
     }
 
-    .scorecard .total-row td:last-child {
-        font-size: 14px;
+    .scorecard td:last-child {
+        font-size: 13px;
     }
 
-    .game-area {
-        gap: 12px;
-    }
-
-    .player-info h2 {
-        font-size: 20px;
+    .dice-container {
+        gap: 10px;
     }
 
     .die {
@@ -430,14 +503,37 @@ body {
         transform: rotateX(-90deg) translateZ(30.5px);
     }
 
-    .dice-container {
-        gap: 16px;
-        max-width: 400px;
+    .pip {
+        width: 9px;
+        height: 9px;
     }
 
-    .roll-button {
-        width: 85px;
-        height: 85px;
+    .top-left {
+        top: 9px;
+        left: 9px;
+    }
+
+    .top-right {
+        top: 9px;
+        right: 9px;
+    }
+
+    .bottom-left {
+        bottom: 9px;
+        left: 9px;
+    }
+
+    .bottom-right {
+        right: 9px;
+        bottom: 9px;
+    }
+
+    .middle-left {
+        left: 9px;
+    }
+
+    .middle-right {
+        right: 9px;
     }
 }
 
@@ -461,15 +557,21 @@ body {
         padding: 10px 0;
     }
 
-    .scorecard {
+    .game-container>.scorecard {
         grid-row: 2;
         width: 100%;
-        max-width: 360px;
+        max-width: 420px;
         margin: 0 auto;
     }
 
+    .scorecard th,
+    .scorecard td {
+        padding: 7px 12px;
+        font-size: 13px;
+    }
+
     .dice-container {
-        gap: 12px;
+        gap: 10px;
     }
 
     .die {
@@ -512,8 +614,8 @@ body {
     }
 
     .pip {
-        width: 9px;
-        height: 9px;
+        width: 8px;
+        height: 8px;
     }
 
     .top-left {
