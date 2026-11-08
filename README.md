@@ -14,3 +14,4 @@ A single-player Yatzy dice game built with HTML, CSS, JavaScript, Node.js, and E
 2. Install the dependencies:
 
    npm install
+3. Run node server.js
